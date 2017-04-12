@@ -1,3 +1,8 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -19,11 +24,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 public class DataFetcher {
 
@@ -68,7 +68,6 @@ public class DataFetcher {
 				.get();
 
 		Element table = doc.select("table").get(0);
-
 		Elements rows = table.select("tr");
 
 		Map<String, Product> productMap = new HashMap<>();
@@ -145,12 +144,17 @@ public class DataFetcher {
 			return depProduct;
 		}
 
+		depProduct = productMap.get(itemName.substring(0, itemName.length() - 1));
+		if (depProduct != null) {
+			return depProduct;
+		}
+
 		if("Electrical Comp.".equalsIgnoreCase(itemName) || "Electrical Comp".equalsIgnoreCase(itemName)) {
 			return productMap.get("Electrical Components");
 		} else if ("Microwave".equalsIgnoreCase(itemName)) {
 			return productMap.get("Microwave Oven");
 		}
 
-		return null;
+		throw new NullPointerException(String.format("Could not find product for name '%s'", itemName));
 	}
 }
